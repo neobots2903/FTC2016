@@ -27,8 +27,7 @@ public class pidexample
 
 		// set initial input and output values
 		pid2903.setInput(input);
-		pid2903.setOutput(output);
-		
+	
 		// set target value (setpoint)
 		pid2903.setSetpoint(setpoint);
 		
@@ -40,42 +39,61 @@ public class pidexample
 		
 		int x = 0;
 		gyroPos = 0;
+
+		
+//		try {
+//			Thread.sleep(100);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		output = pid2903.compute(input);
 		
 		do
 		{
-			loop();
-			System.out.format("gyroPos = %f ***** output = %f%n", gyroPos, output);
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
+			loop();
+			System.out.format("gyroPos = %f ***** output = %f%n", gyroPos, output);
 			
-			gyroPos += Math.random() * 10;
+			if (output > 0)
+				gyroPos += Math.random() * 10;
 			
 		}
 		while (gyroPos < setpoint);
+		System.out.format("gyroPos = %f ***** output = %f%n", gyroPos, output);
 	}
+	
+	static boolean setCons = false;
+	static boolean setAgg = false;
 	
 	static void loop()
 	{
 		input = gyroPos;
-		pid2903.setInput(input);
 		
 		double gap = setpoint - input;
 		if (gap < 10)
 		{
-			// we're getting close to the goal
-			pid2903.setTunings(consKp, consKi, consKd);
+			if (!setCons) {
+				// we're getting close to the goal
+				pid2903.setTunings(consKp, consKi, consKd);
+				setCons = true;
+			}
 		}
 		else
 		{
-			// we're still far from goal, use aggressive values
-			pid2903.setTunings(aggKp, aggKi, aggKd);
+			if (!setAgg){
+				// we're still far from goal, use aggressive values
+				pid2903.setTunings(aggKp, aggKi, aggKd);
+				setAgg = true;
+			}
 		}
 		
-		output = pid2903.compute();
-//		output = pid2903.getOutput();
+		output = pid2903.compute(input);
 	}
 }

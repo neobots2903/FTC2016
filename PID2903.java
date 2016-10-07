@@ -64,8 +64,10 @@ public class PID2903
      * 	generated output.  If not enough time has elapsed, then a new output
      *  value is not generated.
      */
-    public double compute()
+    public double compute(double newInput)
     {
+    	input = newInput;
+    	
         if (inAuto)
         {
 	        long now = System.currentTimeMillis();
